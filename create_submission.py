@@ -36,7 +36,7 @@ test_df = pd.read_csv("test.csv")
 # print(f"Sentence2: {train_df.loc[1, 'target']}")
 # print(f"Similarity: {train_df.loc[1, 'score']}")
 
-
+labels = ["0.0", "0.25", "0.5", "0.75", "1.0"]
 
 class BertSemanticDataGenerator(tf.keras.utils.Sequence):
     """Generates batches of data.
@@ -164,7 +164,7 @@ with strategy.scope():
         metrics=["acc"],
     )
 
-model.load_weights('weights_savefile')
+model.load_weights('weights_dir/weights_savefile')
 
 
 y_test = tf.keras.utils.to_categorical(valid_df.score, num_classes=5)
@@ -175,9 +175,7 @@ test_data = BertSemanticDataGenerator(
     batch_size=batch_size,
     shuffle=False,
 )
-model.evaluate(test_data, verbose=1)
-
-labels = ["0.0", "0.25", "0.5", "0.75", "1.0"]
+# model.evaluate(test_data, verbose=1)
 
 
 def check_similarity(sentence1, sentence2):

@@ -12,6 +12,7 @@ max_length = 128  # Maximum length of input sentence to the model.
 batch_size = 32
 epochs = 1
 
+labels = ["0.0", "0.25", "0.5", "0.75", "1.0"]
 
 all_data_df = pd.read_csv("train.csv")
 train_df = all_data_df.sample(frac=0.05)
@@ -24,9 +25,9 @@ test_df = pd.read_csv("test.csv")
 # print(f"Total validation samples: {valid_df.shape[0]}")
 # print(f"Total test samples: {valid_df.shape[0]}")
 
-# print(f"Sentence1: {train_df.loc[1, 'anchor']}")
-# print(f"Sentence2: {train_df.loc[1, 'target']}")
-# print(f"Similarity: {train_df.loc[1, 'score']}")
+print(f"Sentence1: {train_df.anchor}")
+print(f"Sentence2: {train_df.target}")
+print(f"Similarity: {train_df.score}")
 
 
 
@@ -160,10 +161,22 @@ with strategy.scope():
 # print(f"Strategy: {strategy}")
 # model.summary()
 
+train_df["label"] = train_df["score"].apply(
+    lambda x: 0 if x == 0 else 1 if x == 0.25 else 2 if x == 0.5 else 3 if x == 0.75 else 4
+)
 
-y_train = tf.keras.utils.to_categorical(train_df.score, num_classes=5)
-y_val = tf.keras.utils.to_categorical(valid_df.score, num_classes=5)
+valid_df["label"] = valid_df["score"].apply(
+    lambda x: 0 if x == 0 else 1 if x == 0.25 else 2 if x == 0.5 else 3 if x == 0.75 else 4
+)
+
+# print("train_df: ", train_df)
+# print("train_df.shape: ", train_df.shape)
+
+y_train = tf.keras.utils.to_categorical(train_df.label, num_classes=5)
+print("y_train: ", y_train)
+y_val = tf.keras.utils.to_categorical(valid_df.label, num_classes=5)
 # y_test = tf.keras.utils.to_categorical(test_df.score, num_classes=5)
+print("y_val: ", y_val)
 
 train_data = BertSemanticDataGenerator(
     train_df[["anchor", "target"]].values.astype("str"),
@@ -189,4 +202,4 @@ history = model.fit(
 
 print("done training")
 
-model.save_weights('weights_savefile')
+model.save_weights('weights_dir/weights_savefile')
