@@ -14,7 +14,7 @@ epochs = 1
 
 
 all_data_df = pd.read_csv("train.csv")
-train_df = all_data_df.sample(frac=0.7)
+train_df = all_data_df.sample(frac=0.05)
 valid_df = all_data_df.sample(frac=0.3)
 
 test_df = pd.read_csv("test.csv")
@@ -186,3 +186,7 @@ history = model.fit(
     use_multiprocessing=True,
     workers=-1,
 )
+
+print("done training")
+
+model.save_weights('weights_savefile')
