@@ -6,14 +6,6 @@ import tensorflow as tf
 import transformers
 
 
-import numpy as np
-import pandas as pd
-import os
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2' 
-import tensorflow as tf
-import transformers
-
-
 
 
 max_length = 128  # Maximum length of input sentence to the model.
@@ -191,14 +183,27 @@ def check_similarity(sentence1, sentence2):
     return pred, proba
 
 
-sentence1 = "abatement"
-sentence2 = "abatement of pollution"
 
-print(check_similarity(sentence1, sentence2))
+# sentence_pairs = np.array([[str(sentence1), str(sentence2)]])
+sentence_pairs = test_df[['anchor', 'target']].to_numpy()
 
-test_df['score'] = test_df.apply(lambda x: check_similarity(x['anchor'], x['target']), axis=1)
+test_data = BertSemanticDataGenerator(
+        sentence_pairs, labels=None, batch_size=35, shuffle=False, include_targets=False,
+    )
 
-print(test_df)
+proba = model.predict(test_data[0])
+print(proba)
+pred_list = []
+for prob_row in proba:
+    idx_curr = np.argmax(prob_row)
+    pred_list.append(labels[idx])
+
+
+print(pred_list)
+
+# test_df['score'] = test_df.apply(lambda x: check_similarity(x['anchor'], x['target']), axis=1)
+
+
 
 
 # previously_trained_model = tf.keras.models.load_model('trained_model')
